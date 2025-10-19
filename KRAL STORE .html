@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KRAL STORE - Uygulama Mağazası</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f5f5;
+  --card: #ffffff;
+  --text: #1e293b;
+  --subtext: #64748b;
+  --primary: #1d4ed8;
+}
+body.dark {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #f8fafc;
+  --subtext: #94a3b8;
+  --primary: #3b82f6;
+}
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  transition: 0.3s;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+header input {
+  width: 65%;
+  padding: 8px;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+}
+#themeToggle {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+#categories {
+  display: flex;
+  justify-content: center;
+  background: var(--card);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+#categories button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  color: var(--subtext);
+  cursor: pointer;
+  transition: 0.2s;
+}
+#categories button.active {
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
+}
+#appList {
+  padding: 10px;
+}
+.app-item {
+  display: flex;
+  align-items: center;
+  background: var(--card);
+  border-radius: 10px;
+  margin: 10px 0;
+  padding: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+.app-item:hover { transform: scale(1.02); }
+.app-item img {
+  width: 70px;
+  height: 70px;
+  border-radius: 15px;
+  margin-right: 12px;
+}
+.app-info { flex: 1; }
+.app-info h3 { margin: 0; font-size: 15px; }
+.app-info p { margin: 3px 0; font-size: 13px; color: var(--subtext); }
+.badge { background: #22c55e; color: white; border-radius: 6px; font-size: 11px; padding: 2px 6px; margin-left: 6px; }
+.badge.popular { background: #f59e0b; }
+.download-btn { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 6px 10px; cursor: pointer; font-size: 13px; font-weight: bold; }
+#emptyMsg { text-align: center; color: var(--subtext); margin-top: 30px; }
+footer { text-align: center; padding: 15px; font-size: 12px; color: var(--subtext); }
+</style>
+</head>
+<body>
+<header>
+  <span style="font-weight:600;">📱 KRAL STORE</span>
+  <input type="text" id="searchInput" placeholder="Uygulama ara...">
+  <button id="themeToggle">🌙</button>
+</header>
+
+<div id="categories">
+  <button class="active" data-cat="all">Tümü</button>
+  <button data-cat="Oyun">Oyunlar</button>
+  <button data-cat="Araç">Araçlar</button>
+  <button data-cat="Diğer">Diğer</button>
+</div>
+
+<div id="appList"></div>
+<p id="emptyMsg" style="display:none;">Sonuç bulunamadı 🔍</p>
+<footer>© 2025 KRAL STORE</footer>
+
+<script>
+// Tüm uygulamalar
+const apps = [
+  { name: "KRAL TV BOX", size: "20 MB", rating: 4.6, link: "https://www.dropbox.com/s/a9fqhp6uiqdwmod/KRAL_TV_BOX.9.8.apk?dl=1", category: "Diğer", icon: "https://cdn-icons-png.flaticon.com/512/888/888857.png", tag: "Popüler" },
+  { name: "TURHANTVHD", size: "25 MB", rating: 4.2, link: "https://dl.dropbox.com/scl/fi/f4ycasxulz8hdysl39mmg/TURHANTVHD-1.apk?rlkey=qk5qa2dgsop9lakurojz2bcsu&st=oytv3t92", category: "Diğer", icon: "https://cdn-icons-png.flaticon.com/512/888/888857.png", tag: "" },
+  { name: "Purple Maç TV", size: "22 MB", rating: 4.1, link: "https://www.dropbox.com/s/6z0i92dn7o2c2u3nsvpd9/Purple-Ma-Tv.apk?dl=1", category: "Diğer", icon: "https://cdn-icons-png.flaticon.com/512/888/888857.png", tag: "" },
+  { name: "Tombik", size: "40 MB", rating: 4.3, link: "https://www.dropbox.com/s/hv89gm01m39zm56o4mryp/tombik.apk?dl=1", category: "Oyun", icon: "https://cdn-icons-png.flaticon.com/512/888/888857.png", tag: "Yeni" },
+  { name: "Gpik 1.2.0", size: "22 MB", rating: 4.1, link: "https://www.dropbox.com/s/rh2mht3nm6i7wo6mfggij/Gpik-Reklams-z-1.2.0.apk?dl=1", category: "Araç", icon: "https://cdn-icons-png.flaticon.com/512/888/888857.png", tag: "" },
+  { name: "PARSTV", size: "21 MB", rating: 4.0, link: "https://www.dropbox.com/s/bar1hivh6ixfkk7n1oc5p/PARSTV-V.4.apk?dl=1", category: "Diğer", icon: "https://cdn-icons-png.flaticon.com/512/888/888857.png", tag: "" },
+  { name: "FusionGO", size: "21 MB", rating: 4.7, link: "https://dl.dropbox.com/scl/fi/2lqiidxo12yxc3k27q5l8/FUS-ON-GOO.apk?rlkey=teghnbjpfjjclxi7noi52zkpe&st=dz3xd82b", category: "Diğer", icon: "https://cdn-icons-png.flaticon.com/512/888/888857.png", tag: "Yeni" },
+  { name: "PlayGO", size: "19 MB", rating: 4.8, link: "https://dl.dropbox.com/scl/fi/05tutf14vjmrbxx1bbn76/playgo.apk?rlkey=p4yeyhf85u525yxy0325m2qgz&st=uzr4oqda", category: "Diğer", icon: "https://cdn-icons-png.flaticon.com/512/888/888857.png", tag: "Popüler" },
+  { name: "İ PLAY TV", size: "23 MB", rating: 4.5, link: "https://dl.dropbox.com/scl/fi/e3j893ppgyf8sfdkgch5b/PLAY-TV-4.4.4.apk?rlkey=je7sn5ty9q0wbcn0vyk7lwvoq&st=64nkkzmu", category: "Diğer", icon: "https://cdn-icons-png.flaticon.com/512/888/888857.png", tag: "Yeni" },
+  { name: "SANSAR TV", size: "29.02 MB", rating: 4.5, link: "https://dl.dropbox.com/scl/fi/gn4w1ugoyna5pk5ie1uir/SANSAR-TV-1.apk?rlkey=fk4jgffmo0wpepg6d2qny00cg&st=171a63bw", category: "Diğer", icon: "https://cdn-icons-png.flaticon.com/512/888/888857.png", tag: "Yeni" }
+];
+
+// Listeleme fonksiyonu
+function renderApps(category="all", search="") {
+  const list = document.getElementById("appList");
+  list.innerHTML = "";
+  let found = 0;
+  apps.forEach(app => {
+    if ((category==="all" || app.category===category) && app.name.toLowerCase().includes(search.toLowerCase())) {
+      found++;
+      const div = document.createElement("div");
+      div.className = "app-item";
+      const badge = app.tag === "Yeni" ? "<span class='badge'>Yeni</span>" : app.tag === "Popüler" ? "<span class='badge popular'>Popüler</span>" : "";
+      div.innerHTML = `
+        <img src="${app.icon}">
+        <div class="app-info">
+          <h3>${app.name} ${badge}</h3>
+          <p>${app.category} • ${app.size}</p>
+          <p>⭐ ${app.rating.toFixed(1)}</p>
+        </div>
+        <button class="download-btn" onclick="download('${app.link}', this)">Yükle</button>
+      `;
+      list.appendChild(div);
+    }
+  });
+  document.getElementById("emptyMsg").style.display = found ? "none" : "block";
+}
+
+// İndirme butonu animasyonu
+function download(url, btn){
+  btn.textContent = "İndiriliyor...";
+  btn.disabled = true;
+  setTimeout(()=>window.location.href = url, 1000);
+  setTimeout(()=>{ btn.textContent = "Yükle"; btn.disabled=false; },3000);
+}
+
+// Kategori değişimi
+document.querySelectorAll("#categories button").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll("#categories button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    renderApps(btn.dataset.cat, document.getElementById("searchInput").value);
+  });
+});
+
+// Arama
+document.getElementById("searchInput").addEventListener("input", (e)=>{
+  const activeCat = document.querySelector("#categories button.active").dataset.cat;
+  renderApps(activeCat, e.target.value);
+});
+
+// Tema geçişi
+document.getElementById("themeToggle").addEventListener("click",()=>{
+  document.body.classList.toggle("dark");
+  document.getElementById("themeToggle").textContent = 
+    document.body.classList.contains("dark") ? "☀️" : "🌙";
+});
+
+renderApps();
+</script>
+</body>
+</html>
